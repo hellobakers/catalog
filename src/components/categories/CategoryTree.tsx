@@ -165,7 +165,7 @@ function SortableRow({ node, depth, ...handlers }: SortableRowProps) {
           "group relative flex items-center gap-3 rounded-2xl border p-3 transition-all",
           isSelected
             ? "border-primary bg-primary/5 shadow-lg shadow-primary/5 ring-1 ring-primary/20"
-            : "border-border bg-card hover:border-primary/30 hover:bg-accent/50",
+            : "border-border bg-muted/20 hover:border-primary/30 hover:bg-accent/50",
           isDragging ? "shadow-2xl scale-[1.02] border-primary" : ""
         )}
       >
@@ -284,7 +284,7 @@ function SortableRow({ node, depth, ...handlers }: SortableRowProps) {
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
-            className="ml-10 mt-2 border-l-2 border-border/50 pl-4"
+            className="ml-10 mt-2 border-l-2 border-border pl-4"
           >
             <SiblingGroup
               siblings={node.children}

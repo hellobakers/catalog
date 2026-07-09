@@ -153,7 +153,7 @@ export default function ProductForm({
         </div>
       </FadeIn>
 
-      <FadeIn delay={0.2} className="overflow-hidden rounded-3xl border bg-card shadow-sm">
+      <FadeIn delay={0.2} className="rounded-3xl border bg-card shadow-sm">
         <div className="flex items-center justify-between border-b bg-muted/30 px-6 py-5">
           <div className="flex items-center gap-3">
             <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
