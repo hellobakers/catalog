@@ -28,7 +28,7 @@ export async function middleware(request: NextRequest) {
   if (isPublicPath && token) {
     const session = await verifySessionEdge(token);
     if (session) {
-      return NextResponse.redirect(new URL("/products", request.url));
+      return NextResponse.redirect(new URL("/browse", request.url));
     }
   }
 
@@ -42,5 +42,6 @@ export const config = {
     "/add-product",
     "/products/:path*",
     "/categories/:path*",
+    "/browse/:path*",
   ],
 };

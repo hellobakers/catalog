@@ -9,6 +9,7 @@ import {
   LogOut,
   User,
   FolderTree,
+  LayoutGrid,
 } from "lucide-react";
 import { useAuth } from "@/src/context/AuthContext";
 import toast from "react-hot-toast";
@@ -21,7 +22,7 @@ export default function Navbar() {
   const { user, logoutUser } = useAuth();
 
   const isActive = (path: string) =>
-    pathname === path || pathname.startsWith(`${path}/`);
+    pathname === path || (path !== "/" && pathname.startsWith(`${path}/`)) || (path === "/" && pathname === "/");
 
   const handleLogout = async () => {
     try {
@@ -34,6 +35,7 @@ export default function Navbar() {
   };
 
   const navLinks = [
+    { href: "/browse", label: "Browse", icon: LayoutGrid },
     { href: "/products", label: "Products", icon: LayoutDashboard },
     { href: "/categories", label: "Categories", icon: FolderTree },
     { href: "/add-product", label: "Add Product", icon: Plus },
@@ -42,7 +44,7 @@ export default function Navbar() {
   return (
     <nav className="sticky top-0 z-50 border-b bg-background/80 backdrop-blur-xl transition-all">
       <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6 lg:px-8">
-        <Link href="/products" className="group flex items-center gap-2.5">
+        <Link href="/browse" className="group flex items-center gap-2.5">
           <motion.div 
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
