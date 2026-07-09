@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { verifySession } from "./lib/session";
+import { verifySessionEdge } from "./lib/session-edge";
 
 export async function middleware(request: NextRequest) {
   const path = request.nextUrl.pathname;
@@ -17,7 +17,7 @@ export async function middleware(request: NextRequest) {
   }
 
   if (token && !isPublicPath) {
-    const session = await verifySession(token);
+    const session = await verifySessionEdge(token);
     if (!session) {
       const response = NextResponse.redirect(new URL("/login", request.url));
       response.cookies.delete("auth_token");
@@ -26,7 +26,7 @@ export async function middleware(request: NextRequest) {
   }
 
   if (isPublicPath && token) {
-    const session = await verifySession(token);
+    const session = await verifySessionEdge(token);
     if (session) {
       return NextResponse.redirect(new URL("/products", request.url));
     }

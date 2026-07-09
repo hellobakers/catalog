@@ -24,28 +24,27 @@ export default function EditProductPage() {
   const [existingImages, setExistingImages] = useState<string[]>([]);
 
   useEffect(() => {
-    if (user && params.id) {
-      fetchProduct();
-    }
-  }, [user, params.id]);
+    if (!user || !params.id) return;
 
-  const fetchProduct = async () => {
-    if (!user) return;
-    try {
-      const data = await getProduct(params.id as string, user.id);
-      setProduct(data);
-      setExistingImages(
-        (data.product_images || []).map(
-          (img: { image_url: string }) => img.image_url
-        )
-      );
-    } catch {
-      toast.error("Product not found or you do not have access");
-      router.push("/products");
-    } finally {
-      setLoading(false);
-    }
-  };
+    const loadProduct = async () => {
+      try {
+        const data = await getProduct(params.id as string, user.id);
+        setProduct(data);
+        setExistingImages(
+          (data.product_images || []).map(
+            (img: { image_url: string }) => img.image_url
+          )
+        );
+      } catch {
+        toast.error("Product not found or you do not have access");
+        router.push("/products");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadProduct();
+  }, [user, params.id, router]);
 
   const onSubmit = async (formData: ProductFormData) => {
     if (!product || !user) return;

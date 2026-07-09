@@ -34,24 +34,23 @@ export default function ProductDetailPage() {
   const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
-    if (user && params.id) {
-      fetchProduct();
-    }
-  }, [user, params.id]);
+    if (!user || !params.id) return;
 
-  const fetchProduct = async () => {
-    if (!user) return;
-    setLoading(true);
-    try {
-      const data = await getProduct(params.id as string, user.id);
-      setProduct(data);
-    } catch {
-      toast.error("Product not found or you do not have access");
-      router.push("/products");
-    } finally {
-      setLoading(false);
-    }
-  };
+    const loadProduct = async () => {
+      setLoading(true);
+      try {
+        const data = await getProduct(params.id as string, user.id);
+        setProduct(data);
+      } catch {
+        toast.error("Product not found or you do not have access");
+        router.push("/products");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadProduct();
+  }, [user, params.id, router]);
 
   const handleDelete = async () => {
     if (!product || !user) return;
