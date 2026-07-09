@@ -1,4 +1,3 @@
-// src/app/(protected)/products/[id]/page.tsx
 "use client";
 
 import { useState, useEffect } from "react";
@@ -11,6 +10,8 @@ import {
   Globe,
   MapPin,
   Calendar,
+  Sparkles,
+  ExternalLink,
 } from "lucide-react";
 import toast from "react-hot-toast";
 import ProductGallery from "@/src/components/ProductGallery";
@@ -23,6 +24,9 @@ import { getProduct, deleteProduct } from "@/src/lib/products";
 import { supabase } from "@/src/lib/supabaseClient";
 import { formatDate } from "@/src/utils/helpers";
 import type { Product } from "@/src/types";
+import { motion } from "framer-motion";
+import { FadeIn, ScaleIn } from "@/src/components/Motion";
+import { cn } from "@/src/lib/utils";
 
 export default function ProductDetailPage() {
   const params = useParams();
@@ -79,8 +83,8 @@ export default function ProductDetailPage() {
 
   if (loading) {
     return (
-      <div>
-        <div className="h-8 w-24 bg-gray-200 rounded animate-pulse mb-6" />
+      <div className="space-y-6">
+        <div className="h-10 w-32 animate-pulse rounded-xl bg-muted" />
         <ProductDetailSkeleton />
       </div>
     );
@@ -97,110 +101,130 @@ export default function ProductDetailPage() {
     primaryImage || product.product_images?.[0]?.image_url || null;
 
   return (
-    <div>
-      <div className="flex items-center justify-between mb-6">
+    <div className="space-y-8 pb-12">
+      <FadeIn direction="down" className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
         <Link
           href="/products"
-          className="inline-flex items-center gap-1.5 text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors"
+          className="group inline-flex items-center gap-2 text-sm font-bold uppercase tracking-widest text-muted-foreground transition-colors hover:text-primary"
         >
-          <ArrowLeft className="h-4 w-4" />
-          Back to Products
+          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-secondary transition-transform group-hover:-translate-x-1">
+            <ArrowLeft className="h-4 w-4" />
+          </div>
+          Back to Inventory
         </Link>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-3">
           <WhatsAppButton product={product} firstImage={firstImage} />
           <Link
             href={`/products/${product.id}/edit`}
-            className="inline-flex items-center gap-1.5 rounded-lg border border-gray-300 px-3 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50"
+            className="inline-flex items-center gap-2 rounded-2xl bg-secondary px-5 py-2.5 text-sm font-bold text-secondary-foreground transition-all hover:bg-secondary/80"
           >
             <Edit className="h-4 w-4" />
             Edit
           </Link>
           <button
             onClick={() => setShowDeleteDialog(true)}
-            className="inline-flex items-center gap-1.5 rounded-lg border border-red-300 px-3 py-2 text-sm font-medium text-red-600 transition-colors hover:bg-red-50"
+            className="inline-flex items-center gap-2 rounded-2xl bg-destructive/10 px-5 py-2.5 text-sm font-bold text-destructive transition-all hover:bg-destructive hover:text-destructive-foreground"
           >
             <Trash2 className="h-4 w-4" />
             Delete
           </button>
         </div>
-      </div>
+      </FadeIn>
 
-      <div className="grid grid-cols-1 gap-8 md:grid-cols-2">
-        <ProductGallery
-          images={
-            product.product_images?.length > 0
-              ? product.product_images
-              : [{ image_url: "/placeholder.svg", is_primary: true }]
-          }
-          productName={product.name}
-        />
+      <div className="grid grid-cols-1 gap-12 lg:grid-cols-2">
+        <ScaleIn className="overflow-hidden rounded-[2.5rem] border bg-card p-4 shadow-2xl shadow-primary/5">
+          <ProductGallery
+            images={
+              product.product_images?.length > 0
+                ? product.product_images
+                : [{ image_url: "/placeholder.svg", is_primary: true }]
+            }
+            productName={product.name}
+          />
+        </ScaleIn>
 
-        <div className="space-y-6">
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900">
-              {product.name}
-            </h1>
-            <p className="mt-1 text-sm text-gray-500 font-mono">
-              {product.unique_product_id}
-            </p>
-          </div>
-
-          <div className="space-y-3">
-            {(product.location_1 || product.location_2) && (
-              <div className="flex items-start gap-2 text-sm text-gray-600">
-                <MapPin className="h-4 w-4 mt-0.5 text-gray-400 flex-shrink-0" />
-                <span>
-                  {[product.location_1, product.location_2]
-                    .filter(Boolean)
-                    .join(", ")}
-                </span>
+        <div className="flex flex-col space-y-8 py-4">
+          <FadeIn delay={0.1} direction="none" className="space-y-4">
+            <div className="space-y-2">
+              <div className="flex items-center gap-2 text-primary">
+                <Sparkles className="h-5 w-5" />
+                <span className="text-[10px] font-black uppercase tracking-[0.2em]">Product Details</span>
               </div>
-            )}
-            {product.website_url && (
-              <div className="flex items-start gap-2 text-sm">
-                <Globe className="h-4 w-4 mt-0.5 text-gray-400 flex-shrink-0" />
-                <a
-                  href={product.website_url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-blue-600 hover:text-blue-700 hover:underline"
-                >
-                  {product.website_url}
-                </a>
+              <h1 className="text-4xl font-black tracking-tight text-foreground lg:text-5xl">
+                {product.name}
+              </h1>
+              <div className="inline-flex rounded-full bg-muted px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
+                ID: {product.unique_product_id}
               </div>
-            )}
-            <div className="flex items-start gap-2 text-sm text-gray-600">
-              <Calendar className="h-4 w-4 mt-0.5 text-gray-400 flex-shrink-0" />
-              <span>Created {formatDate(product.created_at)}</span>
             </div>
-          </div>
+
+            <div className="flex flex-wrap gap-4 rounded-3xl border bg-muted/30 p-6">
+              {(product.location_1 || product.location_2) && (
+                <div className="flex items-center gap-3 text-sm font-bold text-foreground">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-background shadow-sm">
+                    <MapPin className="h-5 w-5 text-primary" />
+                  </div>
+                  <div className="flex flex-col">
+                    <span className="text-[10px] uppercase tracking-widest text-muted-foreground">Location</span>
+                    <span>{[product.location_1, product.location_2].filter(Boolean).join(", ")}</span>
+                  </div>
+                </div>
+              )}
+              {product.website_url && (
+                <div className="flex items-center gap-3 text-sm font-bold text-foreground">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-background shadow-sm">
+                    <Globe className="h-5 w-5 text-primary" />
+                  </div>
+                  <div className="flex flex-col">
+                    <span className="text-[10px] uppercase tracking-widest text-muted-foreground">External Link</span>
+                    <a
+                      href={product.website_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1 text-primary hover:underline"
+                    >
+                      Visit Site <ExternalLink className="h-3 w-3" />
+                    </a>
+                  </div>
+                </div>
+              )}
+              <div className="flex items-center gap-3 text-sm font-bold text-foreground">
+                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-background shadow-sm">
+                  <Calendar className="h-5 w-5 text-primary" />
+                </div>
+                <div className="flex flex-col">
+                  <span className="text-[10px] uppercase tracking-widest text-muted-foreground">Added On</span>
+                  <span>{formatDate(product.created_at)}</span>
+                </div>
+              </div>
+            </div>
+          </FadeIn>
 
           {product.categories && product.categories.length > 0 && (
-            <div>
-              <h2 className="text-sm font-semibold text-gray-900 mb-2">
-                Categories
-              </h2>
-              <div className="flex flex-wrap gap-1.5">
+            <FadeIn delay={0.2} direction="none" className="space-y-4">
+              <h2 className="text-xs font-black uppercase tracking-widest text-muted-foreground">Assigned Categories</h2>
+              <div className="flex flex-wrap gap-2">
                 {product.categories.map((c) => (
                   <CategoryBadge
                     key={c.id}
                     category={c}
                     href={`/categories/${c.id}`}
+                    size="lg"
                   />
                 ))}
               </div>
-            </div>
+            </FadeIn>
           )}
 
           {product.description && (
-            <div>
-              <h2 className="text-sm font-semibold text-gray-900 mb-2">
-                Description
-              </h2>
-              <p className="text-sm text-gray-600 leading-relaxed whitespace-pre-wrap">
-                {product.description}
-              </p>
-            </div>
+            <FadeIn delay={0.3} direction="none" className="space-y-4">
+              <h2 className="text-xs font-black uppercase tracking-widest text-muted-foreground">Product Narrative</h2>
+              <div className="rounded-[2rem] border bg-card p-8 shadow-sm">
+                <p className="text-base leading-relaxed text-muted-foreground/90 whitespace-pre-wrap">
+                  {product.description}
+                </p>
+              </div>
+            </FadeIn>
           )}
         </div>
       </div>
@@ -211,7 +235,7 @@ export default function ProductDetailPage() {
         onConfirm={handleDelete}
         title="Delete Product"
         message={`Are you sure you want to delete "${product.name}"? This action cannot be undone and will remove all associated images.`}
-        confirmLabel="Delete"
+        confirmLabel="Delete Permanently"
         isLoading={deleting}
       />
     </div>

@@ -3,30 +3,26 @@
 import Link from "next/link";
 import { X } from "lucide-react";
 import type { Category } from "@/src/types";
+import { cn } from "@/src/lib/utils";
 
 const DEFAULT_COLOR = "#3b82f6";
 
-/** Choose readable text color (black/white) for a given hex background. */
 function contrastText(hex: string): string {
   const c = hex.replace("#", "");
   if (c.length !== 6) return "#ffffff";
   const r = parseInt(c.slice(0, 2), 16);
   const g = parseInt(c.slice(2, 4), 16);
   const b = parseInt(c.slice(4, 6), 16);
-  // Perceived luminance (YIQ).
   const yiq = (r * 299 + g * 587 + b * 114) / 1000;
   return yiq >= 140 ? "#111827" : "#ffffff";
 }
 
 interface CategoryBadgeProps {
   category: Pick<Category, "id" | "name" | "color" | "icon">;
-  /** Render as a link to the category's product filter. */
   href?: string;
-  /** Show a remove button (for multi-select chips). */
   onRemove?: (id: string) => void;
-  /** Tooltip text, e.g. full hierarchy path. */
   title?: string;
-  size?: "sm" | "md";
+  size?: "sm" | "md" | "lg";
 }
 
 export default function CategoryBadge({
@@ -38,15 +34,23 @@ export default function CategoryBadge({
 }: CategoryBadgeProps) {
   const color = category.color || DEFAULT_COLOR;
   const text = contrastText(color);
-  const pad = size === "sm" ? "px-2 py-0.5 text-xs" : "px-2.5 py-1 text-xs";
+  
+  const sizeClasses = {
+    sm: "px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider",
+    md: "px-3 py-1 text-xs font-bold",
+    lg: "px-4 py-2 text-sm font-bold",
+  };
 
   const inner = (
     <span
-      className={`inline-flex max-w-[12rem] items-center gap-1 rounded-full font-medium ${pad}`}
+      className={cn(
+        "inline-flex max-w-[15rem] items-center gap-1.5 rounded-full shadow-sm transition-all",
+        sizeClasses[size]
+      )}
       style={{ backgroundColor: color, color: text }}
       title={title || category.name}
     >
-      {category.icon && <span className="shrink-0">{category.icon}</span>}
+      {category.icon && <span className="shrink-0 scale-110">{category.icon}</span>}
       <span className="truncate">{category.name}</span>
       {onRemove && (
         <button
@@ -56,10 +60,10 @@ export default function CategoryBadge({
             e.stopPropagation();
             onRemove(category.id);
           }}
-          className="ml-0.5 shrink-0 rounded-full transition-opacity hover:opacity-70"
+          className="ml-1 shrink-0 rounded-full transition-opacity hover:opacity-70"
           aria-label={`Remove ${category.name}`}
         >
-          <X className="h-3 w-3" />
+          <X className={cn(size === "sm" ? "h-2.5 w-2.5" : "h-3.5 w-3.5")} />
         </button>
       )}
     </span>
@@ -67,7 +71,7 @@ export default function CategoryBadge({
 
   if (href) {
     return (
-      <Link href={href} className="transition-transform hover:scale-105">
+      <Link href={href} className="transition-all hover:scale-105 active:scale-95">
         {inner}
       </Link>
     );

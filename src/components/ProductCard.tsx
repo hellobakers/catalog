@@ -2,11 +2,13 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { MapPin, Eye } from "lucide-react";
+import { MapPin, Eye, ExternalLink } from "lucide-react";
 import WhatsAppButton from "./WhatsAppButton";
 import CategoryBadge from "./categories/CategoryBadge";
 import type { Product } from "@/src/types";
 import { truncateText } from "@/src/utils/helpers";
+import { motion } from "framer-motion";
+import { cn } from "@/src/lib/utils";
 
 const MAX_BADGES = 3;
 
@@ -26,36 +28,52 @@ export default function ProductCard({ product }: ProductCardProps) {
   const extraCount = categories.length - shownCategories.length;
 
   return (
-    <div className="group rounded-xl border border-gray-200 bg-white shadow-sm transition-all hover:shadow-lg hover:-translate-y-0.5">
-      <Link href={`/products/${product.id}`}>
-        <div className="relative aspect-[4/3] overflow-hidden rounded-t-xl bg-gray-100">
-          <Image
-            src={firstImage || placeholder}
-            alt={product.name}
-            fill
-            className="object-cover transition-transform group-hover:scale-105"
-            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-          />
-          {!firstImage && (
-            <div className="absolute inset-0 flex items-center justify-center">
-              <span className="text-sm text-gray-400">No image</span>
-            </div>
-          )}
+    <motion.div 
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      whileHover={{ y: -5 }}
+      transition={{ duration: 0.3 }}
+      className="group relative flex flex-col overflow-hidden rounded-2xl border bg-card shadow-sm transition-all hover:shadow-xl hover:shadow-primary/5"
+    >
+      <Link href={`/products/${product.id}`} className="relative aspect-[4/3] overflow-hidden bg-muted">
+        <Image
+          src={firstImage || placeholder}
+          alt={product.name}
+          fill
+          className="object-cover transition-transform duration-500 group-hover:scale-110"
+          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+        
+        <div className="absolute top-3 right-3 flex gap-2">
+          <div className="rounded-full bg-background/80 p-2 text-foreground backdrop-blur-md transition-transform hover:scale-110">
+            <ExternalLink className="h-4 w-4" />
+          </div>
         </div>
+
+        {!firstImage && (
+          <div className="absolute inset-0 flex items-center justify-center">
+            <span className="text-sm font-medium text-muted-foreground">No image available</span>
+          </div>
+        )}
       </Link>
 
-      <div className="p-4">
-        <Link href={`/products/${product.id}`}>
-          <h3 className="font-semibold text-gray-900 group-hover:text-blue-600 transition-colors">
-            {truncateText(product.name, 50)}
-          </h3>
-        </Link>
-        <p className="mt-0.5 text-xs text-gray-500 font-mono">
-          {product.unique_product_id}
-        </p>
+      <div className="flex flex-1 flex-col p-5">
+        <div className="mb-2 flex items-start justify-between gap-2">
+          <div className="space-y-1">
+            <Link href={`/products/${product.id}`}>
+              <h3 className="font-bold leading-tight text-foreground transition-colors hover:text-primary">
+                {truncateText(product.name, 50)}
+              </h3>
+            </Link>
+            <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60">
+              ID: {product.unique_product_id}
+            </p>
+          </div>
+        </div>
 
         {shownCategories.length > 0 && (
-          <div className="mt-2 flex flex-wrap items-center gap-1">
+          <div className="mb-4 flex flex-wrap items-center gap-1.5">
             {shownCategories.map((c) => (
               <CategoryBadge
                 key={c.id}
@@ -65,36 +83,36 @@ export default function ProductCard({ product }: ProductCardProps) {
               />
             ))}
             {extraCount > 0 && (
-              <span className="rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-500">
-                +{extraCount} more
+              <span className="inline-flex items-center rounded-full bg-secondary px-2 py-0.5 text-[10px] font-bold text-secondary-foreground">
+                +{extraCount}
               </span>
             )}
           </div>
         )}
 
-        <div className="mt-3 space-y-1">
+        <div className="mb-5 space-y-2">
           {(product.location_1 || product.location_2) && (
-            <p className="flex items-center gap-1 text-xs text-gray-500">
-              <MapPin className="h-3 w-3" />
+            <p className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
+              <MapPin className="h-3.5 w-3.5 text-primary" />
               {[product.location_1, product.location_2]
                 .filter(Boolean)
                 .join(", ")}
             </p>
           )}
           {product.description && (
-            <p className="text-sm text-gray-600 leading-relaxed">
+            <p className="text-sm leading-relaxed text-muted-foreground/80 line-clamp-2">
               {truncateText(product.description, 100)}
             </p>
           )}
         </div>
 
-        <div className="mt-4 flex items-center gap-2">
+        <div className="mt-auto flex items-center gap-2">
           <Link
             href={`/products/${product.id}`}
-            className="flex flex-1 items-center justify-center gap-1.5 rounded-lg border border-gray-300 px-3 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50"
+            className="inline-flex flex-1 items-center justify-center gap-2 rounded-xl bg-secondary px-4 py-2.5 text-sm font-bold text-secondary-foreground transition-all hover:bg-secondary/80"
           >
             <Eye className="h-4 w-4" />
-            View Details
+            Details
           </Link>
           <WhatsAppButton
             product={product}
@@ -102,6 +120,6 @@ export default function ProductCard({ product }: ProductCardProps) {
           />
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 }
