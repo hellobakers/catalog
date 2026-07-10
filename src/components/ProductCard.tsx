@@ -2,13 +2,14 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { MapPin, Eye, ExternalLink } from "lucide-react";
+import { MapPin, Eye, ExternalLink, Check } from "lucide-react";
 import WhatsAppButton from "./WhatsAppButton";
 import CategoryBadge from "./categories/CategoryBadge";
 import type { Product } from "@/src/types";
 import { truncateText } from "@/src/utils/helpers";
 import { motion } from "framer-motion";
 import { cn } from "@/src/lib/utils";
+import { useProductSelection } from "@/src/context/ProductSelectionContext";
 
 const MAX_BADGES = 3;
 
@@ -17,6 +18,9 @@ interface ProductCardProps {
 }
 
 export default function ProductCard({ product }: ProductCardProps) {
+  const { toggleProduct, isSelected } = useProductSelection();
+  const selected = isSelected(product.id);
+
   const primaryImage = product.product_images?.find(
     (img) => img.is_primary
   )?.image_url;
@@ -33,30 +37,43 @@ export default function ProductCard({ product }: ProductCardProps) {
       animate={{ opacity: 1, y: 0 }}
       whileHover={{ y: -5 }}
       transition={{ duration: 0.3 }}
-      className="group relative flex flex-col overflow-hidden rounded-2xl border bg-card shadow-sm transition-all hover:shadow-xl hover:shadow-primary/5"
+      className={cn(
+        "group relative flex flex-col overflow-hidden rounded-2xl border bg-card shadow-sm transition-all hover:shadow-xl hover:shadow-primary/5",
+        selected ? "border-primary ring-2 ring-primary/20" : "border-border"
+      )}
     >
-      <Link href={`/products/${product.id}`} className="relative aspect-[4/3] overflow-hidden bg-muted">
-        <Image
-          src={firstImage || placeholder}
-          alt={product.name}
-          fill
-          className="object-cover transition-transform duration-500 group-hover:scale-110"
-          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+      <div className="relative aspect-[4/3] overflow-hidden bg-muted">
+        <Link href={`/products/${product.id}`} className="block h-full w-full">
+          <Image
+            src={firstImage || placeholder}
+            alt={product.name}
+            fill
+            className="object-cover transition-transform duration-500 group-hover:scale-110"
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+          />
+        </Link>
+        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100 pointer-events-none" />
         
         <div className="absolute top-3 right-3 flex gap-2">
-          <div className="rounded-full bg-background/80 p-2 text-foreground backdrop-blur-md transition-transform hover:scale-110">
-            <ExternalLink className="h-4 w-4" />
-          </div>
+          <button
+            onClick={() => toggleProduct(product)}
+            className={cn(
+              "flex h-9 w-9 items-center justify-center rounded-full border shadow-lg backdrop-blur-md transition-all",
+              selected 
+                ? "bg-primary border-primary text-primary-foreground scale-110" 
+                : "bg-background/80 border-border text-foreground hover:scale-110"
+            )}
+          >
+            {selected ? <Check className="h-5 w-5" /> : <div className="h-5 w-5 rounded-full border-2 border-current opacity-30" />}
+          </button>
         </div>
 
         {!firstImage && (
-          <div className="absolute inset-0 flex items-center justify-center">
+          <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
             <span className="text-sm font-medium text-muted-foreground">No image available</span>
           </div>
         )}
-      </Link>
+      </div>
 
       <div className="flex flex-1 flex-col p-5">
         <div className="mb-2 flex items-start justify-between gap-2">
