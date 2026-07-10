@@ -230,7 +230,7 @@ export default function CategoryBrowsePage() {
         <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-2">
             <LayoutGrid className="h-5 w-5 text-primary" />
-            <h2 className="text-xs font-black uppercase tracking-[0.2em] text-muted-foreground">Products Listing</h2>
+            <h2 className="text-xs font-black uppercase tracking-[0.2em] text-muted-foreground">Products Listings</h2>
           </div>
           
           <div className="relative w-full max-w-md">
